@@ -1,3 +1,4 @@
+import http from 'http';
 import httpHeaders from 'http-headers';
 
 export function formatRequest(request) {
@@ -31,6 +32,11 @@ export function formatRequest(request) {
   };
 }
 
+export function stringifyRequest(request) {
+  const { method, url, headers = {} } = request;
+  return `${method} ${headers.host}${url}`;
+}
+
 export function formatResponse(response) {
   const statusCode = response.statusCode;
 
@@ -47,4 +53,10 @@ export function formatResponse(response) {
     headers,
     responseTime,
   };
+}
+
+export function stringifyResponse(response) {
+  const statusCode = response.statusCode;
+  const statusMsg = http.STATUS_CODES[statusCode];
+  return `${statusCode} (${statusMsg})`;
 }
