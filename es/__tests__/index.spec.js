@@ -7,7 +7,7 @@ import {
 } from './HttpBuilders';
 
 describe('http-log-format', () => {
-  describe('formatRequest(request)', () => {
+  describe('formatRequest(request, { whitelistHeaders, blacklistHeaders })', () => {
     it('should extract the fields from incoming requests', () => {
       const request = buildIncomingRequest({
         httpVersion: '1.1',
@@ -78,6 +78,38 @@ describe('http-log-format', () => {
         remotePort: 80,
       });
     });
+
+    it('should whitelist headers from the request', () => {
+      const request = buildIncomingRequest({
+        headers: {
+          foo: 'bar',
+          bar: 'baz',
+        },
+      });
+
+      const formattedRequest = formatRequest(request, {
+        whitelistHeaders: ['foo'],
+      });
+
+      expect(formattedRequest.headers.foo).toBe('bar');
+      expect(formattedRequest.headers.bar).toBeUndefined();
+    });
+
+    it('should blacklist headers from the request', () => {
+      const request = buildIncomingRequest({
+        headers: {
+          foo: 'bar',
+          bar: 'baz',
+        },
+      });
+
+      const formattedRequest = formatRequest(request, {
+        blacklistHeaders: ['foo'],
+      });
+
+      expect(formattedRequest.headers.foo).toBeUndefined();
+      expect(formattedRequest.headers.bar).toBe('baz');
+    });
   });
 
   describe('stringifyRequest(request)', () => {
@@ -96,7 +128,7 @@ describe('http-log-format', () => {
     });
   });
 
-  describe('formatResponse(response)', () => {
+  describe('formatResponse(response, { whitelistHeaders, blacklistHeaders })', () => {
     it('should extract the fields from incoming responses', () => {
       const response = buildIncomingResponse({
         timestamp: '2017-04-01T23:01:52Z',
@@ -139,6 +171,38 @@ describe('http-log-format', () => {
         }),
         statusCode: 200,
       });
+    });
+
+    it('should whitelist headers from the response', () => {
+      const response = buildOutgoingResponse({
+        headers: {
+          foo: 'bar',
+          bar: 'baz',
+        },
+      });
+
+      const formattedResponse = formatResponse(response, {
+        whitelistHeaders: ['foo'],
+      });
+
+      expect(formattedResponse.headers.foo).toBe('bar');
+      expect(formattedResponse.headers.bar).toBeUndefined();
+    });
+
+    it('should blacklist headers from the response', () => {
+      const response = buildOutgoingResponse({
+        headers: {
+          foo: 'bar',
+          bar: 'baz',
+        },
+      });
+
+      const formattedResponse = formatResponse(response, {
+        blacklistHeaders: ['foo'],
+      });
+
+      expect(formattedResponse.headers.foo).toBeUndefined();
+      expect(formattedResponse.headers.bar).toBe('baz');
     });
   });
 
