@@ -1,5 +1,5 @@
 import http from 'http';
-import { formatRequest, formatResponse } from '../index';
+import { formatRequest, stringifyRequest, formatResponse, stringifyResponse } from '../index';
 
 function createMockSocket() {
   const localAddress = '127.0.0.1';
@@ -94,6 +94,24 @@ describe('http-log-format', () => {
     });
   });
 
+  describe('stringifyRequest(request)', () => {
+    it('should convert a request object to its string version', () => {
+      const socket = createMockSocket();
+      const request = new http.IncomingMessage(socket);
+      Object.assign(request, {
+        method: 'POST',
+        url: '/home',
+        headers: {
+          host: 'example.com:80',
+        },
+      });
+
+      const stringified = stringifyRequest(request);
+
+      expect(stringified).toBe('POST example.com:80/home');
+    });
+  });
+
   describe('formatResponse(response)', () => {
     it('should extract the fields from incoming responses', () => {
       const socket = createMockSocket();
@@ -150,6 +168,17 @@ describe('http-log-format', () => {
         }),
         statusCode: 404,
       });
+    });
+  });
+
+  describe('stringifyResponse(response)', () => {
+    it('should convert a response object to its string version', () => {
+      const response = new http.ServerResponse({});
+      response.statusCode = 503;
+
+      const stringified = stringifyResponse(response);
+
+      expect(stringified).toBe('503 (Service Unavailable)');
     });
   });
 });
