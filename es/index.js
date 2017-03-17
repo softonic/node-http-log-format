@@ -1,7 +1,22 @@
 import http from 'http';
 import httpHeaders from 'http-headers';
+import { pick, omit } from 'lodash';
 
-export function formatRequest(request) {
+/**
+ * Filters the given headers object picking the given whitelisted headers (if any) and removing
+ * all blacklisted ones
+ * @param  {Object.<string, string>} headers
+ * @param  {string[]} [options.whitelistHeaders]
+ * @param  {string[]} [options.blacklistHeaders]
+ * @return {Object.<string, string>}
+ */
+function filterHeaders(headers, { whitelistHeaders, blacklistHeaders } = {}) {
+  const whitelistedHeaders = whitelistHeaders ? pick(headers, whitelistHeaders) : headers;
+  const blacklistedHeaders = omit(whitelistedHeaders, blacklistHeaders);
+  return blacklistedHeaders;
+}
+
+export function formatRequest(request, { whitelistHeaders, blacklistHeaders } = {}) {
   // `httpVersion` is only available in incoming requests
   const { httpVersion, method } = request;
 
@@ -14,7 +29,8 @@ export function formatRequest(request) {
 
   // `headers` in IncomingMessage, `_headers` in ClientRequest
   // eslint-disable-next-line no-underscore-dangle
-  const headers = request.headers || request._headers || {};
+  const receivedHeaders = request.headers || request._headers || {};
+  const headers = filterHeaders(receivedHeaders, { whitelistHeaders, blacklistHeaders });
 
   const socket = request.socket || {};
   const { remoteAddress, remotePort, localAddress, localPort } = socket;
@@ -37,11 +53,12 @@ export function stringifyRequest(request) {
   return `${method} ${headers.host}${url}`;
 }
 
-export function formatResponse(response) {
+export function formatResponse(response, { whitelistHeaders, blacklistHeaders } = {}) {
   const statusCode = response.statusCode;
 
   // `headers` in IncomingMessage, parsed headers in ServerResponse
-  const headers = response.headers || httpHeaders(response, true) || {};
+  const receivedHeaders = response.headers || httpHeaders(response, true) || {};
+  const headers = filterHeaders(receivedHeaders, { whitelistHeaders, blacklistHeaders });
 
   // `timestamp` and `responseTime` do not belong to the classes that the core Node.js http[s]
   // module returns, but we use them if they are defined
