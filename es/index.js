@@ -16,6 +16,14 @@ function filterHeaders(headers, { whitelistHeaders, blacklistHeaders } = {}) {
   return blacklistedHeaders;
 }
 
+/**
+ * Formats a request with the Softonic HTTP log format
+ * @param  {http.IncomingMessage|http.ClientRequest} request
+ * @param  {Object} [options]
+ * @param  {string[]} [options.whitelistHeaders] List of headers to include in the log
+ * @param  {string[]} [options.blacklistHeaders] List of headers to remove from the log
+ * @return {Object}
+ */
 export function formatRequest(request, { whitelistHeaders, blacklistHeaders } = {}) {
   // `httpVersion` is only available in incoming requests
   const { httpVersion, method } = request;
@@ -48,11 +56,32 @@ export function formatRequest(request, { whitelistHeaders, blacklistHeaders } = 
   };
 }
 
+/**
+ * Returns a string representation of a request
+ *
+ * @example
+ * stringifyRequest(request);
+ * //> 'GET example.com/path?foo=bar'
+ *
+ * @param  {http.IncomingMessage|http.ClientRequest} request
+ * @param  {Object} [options]
+ * @param  {string[]} [options.whitelistHeaders] List of headers to include in the log
+ * @param  {string[]} [options.blacklistHeaders] List of headers to remove from the log
+ * @return {Object}
+ */
 export function stringifyRequest(request) {
   const { method, url, headers = {} } = request;
   return `${method} ${headers.host}${url}`;
 }
 
+/**
+ * Formats a response with the Softonic HTTP log format
+ * @param  {http.IncomingMessage|http.ServerResponse} response
+ * @param  {Object} [options]
+ * @param  {string[]} [options.whitelistHeaders] List of headers to include in the log
+ * @param  {string[]} [options.blacklistHeaders] List of headers to remove from the log
+ * @return {Object}
+ */
 export function formatResponse(response, { whitelistHeaders, blacklistHeaders } = {}) {
   const statusCode = response.statusCode;
 
@@ -72,6 +101,19 @@ export function formatResponse(response, { whitelistHeaders, blacklistHeaders } 
   };
 }
 
+/**
+ * Returns a string representation of a response
+ *
+ * @example
+ * stringifyResponse(response);
+ * //> '201 (Created)'
+ *
+ * @param  {http.IncomingMessage|http.ServerResponse} response
+ * @param  {Object} [options]
+ * @param  {string[]} [options.whitelistHeaders] List of headers to include in the log
+ * @param  {string[]} [options.blacklistHeaders] List of headers to remove from the log
+ * @return {Object}
+ */
 export function stringifyResponse(response) {
   const statusCode = response.statusCode;
   const statusMsg = http.STATUS_CODES[statusCode];
