@@ -13,36 +13,66 @@ npm install @softonic/http-log-format
 ```js
 // CommonJS
 // const http = require('http');
-// const { formatRequest, formatResponse } = require('@softonic/http-log-format');
+// const {
+//   formatRequest,
+//   formatResponse,
+//   stringifyRequest,
+//   stringifyResponse,
+// } = require('@softonic/http-log-format');
 
 // ES2015
 import http from 'http';
-import { formatRequest, formatResponse } from '@softonic/http-log-format';
+import {
+  formatRequest,
+  formatResponse,
+  stringifyRequest,
+  stringifyResponse,
+} from '@softonic/http-log-format';
 
 http.createServer((req, res) => {
   // send response...
 
-  const formattedRequest = formatRequest(req);
-  const formattedResponse = formatResponse(res);
+  const formattedRequest = formatRequest(req, {
+    // whitelist and blacklist should not be used together
+    whitelistHeaders: ['accept', 'accept-language', 'host'],
+    blacklistHeaders: ['cookie'],
+  });
+  const formattedResponse = formatResponse(res, {
+    // whitelist and blacklist should not be used together
+    whitelistHeaders: ['content-type', 'content-language', 'content-length'],
+    blacklistHeaders: ['set-cookie'],
+  });
+
+  const message = `${stringifyRequest(req) ${stringifyResponse(res)}}`;
 
   // Some logger instance
   logger.info({
     request: formattedResponse,
     response: formattedResponse,
-  });
+  }, message);
 });
 
 http.request(options, (res) => {
   // process response...
 
-  const formattedRequest = formatRequest(res.req);
-  const formattedResponse = formatResponse(res);
+  const formattedRequest = formatRequest(res.req, {
+    // whitelist and blacklist should not be used together
+    whitelistHeaders: ['accept', 'accept-language', 'host'],
+    blacklistHeaders: ['cookie'],
+  });
+  const formattedResponse = formatResponse(res, {
+    // whitelist and blacklist should not be used together
+    whitelistHeaders: ['content-type', 'content-language', 'content-length'],
+    blacklistHeaders: ['set-cookie'],
+  });
+
+  const message = `${stringifyRequest(res.req) ${stringifyResponse(res)}}`;
 
   // Some logger instance
   logger.info({
     request: formattedResponse,
     response: formattedResponse,
-  });
+  }, message);
 });
 ```
 
