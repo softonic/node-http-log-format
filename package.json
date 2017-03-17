@@ -3,6 +3,13 @@
   "version": "1.1.2",
   "author": "Rubén Norte <ruben.norte@softonic.com>",
   "description": "Functions to transform native Node.js HTTP requests and responses to the Softonic HTTP log format",
+  "keywords": [
+    "http",
+    "log",
+    "softonic",
+    "request",
+    "response"
+  ],
   "license": "Apache-2.0",
   "main": "index.js",
   "homepage": "https://github.com/softonic/node-http-log-format",
