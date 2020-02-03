@@ -1,4 +1,9 @@
-import { formatRequest, stringifyRequest, formatResponse, stringifyResponse } from '../index';
+import {
+  formatRequest,
+  stringifyRequest,
+  formatResponse,
+  stringifyResponse,
+} from '../index';
 import {
   buildIncomingRequest,
   buildOutgoingRequest,

@@ -21,7 +21,7 @@ export function buildOutgoingRequest({
     headers,
     // Prevent a real request
     agent: null,
-    createConnection: () => {},
+    createConnection: () => { },
   });
 
   // Custom property that we use to track the response time
@@ -57,7 +57,10 @@ export function buildIncomingRequest({
     remotePort,
   };
 
-  const realHeaders = Object.assign({}, headers, { host: `${host}:${port}` });
+  const realHeaders = {
+    ...headers,
+    host: `${host}:${port}`,
+  };
 
   const request = new http.IncomingMessage(socket);
   Object.assign(request, {
@@ -102,7 +105,9 @@ export function buildOutgoingResponse({
   const req = {};
   const response = new http.ServerResponse(req);
 
-  Object.keys(headers).forEach(headerName => response.setHeader(headerName, headers[headerName]));
+  Object.keys(headers).forEach((headerName) => {
+    response.setHeader(headerName, headers[headerName]);
+  });
   response.flushHeaders();
 
   Object.assign(response, {
